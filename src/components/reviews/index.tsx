@@ -7,14 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Beaker } from "lucide-react";
 
 const SmartReviewFilter = () => {
+  // Use localStorage to persist the user role between page refreshes
+  const savedRole = localStorage.getItem("reviewFilterUserRole") || "user";
   const [userRole, setUserRole] = useState<"user" | "admin" | "testing">(
-    "user",
+    savedRole as "user" | "admin" | "testing",
   );
 
   const toggleRole = () => {
-    if (userRole === "user") setUserRole("admin");
-    else if (userRole === "admin") setUserRole("testing");
-    else setUserRole("user");
+    let newRole: "user" | "admin" | "testing";
+    if (userRole === "user") newRole = "admin";
+    else if (userRole === "admin") newRole = "testing";
+    else newRole = "user";
+
+    setUserRole(newRole);
+    localStorage.setItem("reviewFilterUserRole", newRole);
   };
 
   return (

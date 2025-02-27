@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ReviewList from "./ReviewList";
@@ -113,7 +113,15 @@ const SORT_OPTIONS = [
 ];
 
 const ReviewDashboard = () => {
-  const [reviews, setReviews] = useState<ReviewData[]>(MOCK_REVIEWS);
+  // Use localStorage to persist reviews between page refreshes
+  const savedReviews = localStorage.getItem("reviewFilterReviews");
+  const initialReviews = savedReviews ? JSON.parse(savedReviews) : MOCK_REVIEWS;
+  const [reviews, setReviews] = useState<ReviewData[]>(initialReviews);
+
+  // Save reviews to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("reviewFilterReviews", JSON.stringify(reviews));
+  }, [reviews]);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [activeSortOption, setActiveSortOption] = useState("newest");
   const [searchQuery, setSearchQuery] = useState("");
@@ -238,6 +246,9 @@ const ReviewDashboard = () => {
       setReviews([newReview, ...reviews]);
       setIsSubmitting(false);
       alert("Your review has been submitted successfully!");
+
+      // Switch back to the read reviews tab after submission
+      document.querySelector('[data-value="read"]')?.click();
     }, 1500);
   };
 

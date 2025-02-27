@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,10 +69,36 @@ const MOCK_FLAGGED_REVIEWS: ReviewData[] = [
 ];
 
 const AdminModeration = () => {
-  const [flaggedReviews, setFlaggedReviews] =
-    useState<ReviewData[]>(MOCK_FLAGGED_REVIEWS);
-  const [approvedReviews, setApprovedReviews] = useState<ReviewData[]>([]);
-  const [rejectedReviews, setRejectedReviews] = useState<ReviewData[]>([]);
+  // Use localStorage to persist moderation state
+  const savedFlagged = localStorage.getItem("reviewFilterFlaggedReviews");
+  const savedApproved = localStorage.getItem("reviewFilterApprovedReviews");
+  const savedRejected = localStorage.getItem("reviewFilterRejectedReviews");
+
+  const [flaggedReviews, setFlaggedReviews] = useState<ReviewData[]>(
+    savedFlagged ? JSON.parse(savedFlagged) : MOCK_FLAGGED_REVIEWS,
+  );
+  const [approvedReviews, setApprovedReviews] = useState<ReviewData[]>(
+    savedApproved ? JSON.parse(savedApproved) : [],
+  );
+  const [rejectedReviews, setRejectedReviews] = useState<ReviewData[]>(
+    savedRejected ? JSON.parse(savedRejected) : [],
+  );
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(
+      "reviewFilterFlaggedReviews",
+      JSON.stringify(flaggedReviews),
+    );
+    localStorage.setItem(
+      "reviewFilterApprovedReviews",
+      JSON.stringify(approvedReviews),
+    );
+    localStorage.setItem(
+      "reviewFilterRejectedReviews",
+      JSON.stringify(rejectedReviews),
+    );
+  }, [flaggedReviews, approvedReviews, rejectedReviews]);
 
   const handleApprove = (id: string) => {
     const reviewToApprove = flaggedReviews.find((review) => review.id === id);
